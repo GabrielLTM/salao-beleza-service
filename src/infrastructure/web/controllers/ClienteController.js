@@ -1,30 +1,33 @@
 import { Resultado } from '../helpers/Resultado.js';
 
 export class ClienteController {
-  constructor({ listar, buscarPorId, criar, editar, excluir }) {
-    this.listar = listar;
-    this.buscarPorId = buscarPorId;
-    this.criar = criar;
-    this.editar = editar;
-    this.excluir = excluir;
+  /** @param {{ clienteService: import('../../../application/services/ClienteService.js').ClienteService }} deps */
+  constructor({ clienteService }) {
+    this.service = clienteService;
   }
 
   index = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.listar.executar(req.paginacao))); } catch (e) { return next(e); }
+    try { return res.json(Resultado.ok(await this.service.listar(req.paginacao))); }
+    catch (e) { return next(e); }
   };
+
   show = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.buscarPorId.executar(req.params.id))); } catch (e) { return next(e); }
+    try { return res.json(Resultado.ok(await this.service.buscarPorId(req.params.id))); }
+    catch (e) { return next(e); }
   };
+
   store = async (req, res, next) => {
-    try { return res.status(201).json(Resultado.ok(await this.criar.executar(req.body), 'Cliente criado com sucesso.')); }
+    try { return res.status(201).json(Resultado.ok(await this.service.criar(req.body), 'Cliente criado com sucesso.')); }
     catch (e) { return next(e); }
   };
+
   update = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.editar.executar(req.params.id, req.body), 'Cliente atualizado com sucesso.')); }
+    try { return res.json(Resultado.ok(await this.service.editar(req.params.id, req.body), 'Cliente atualizado com sucesso.')); }
     catch (e) { return next(e); }
   };
+
   destroy = async (req, res, next) => {
-    try { await this.excluir.executar(req.params.id); return res.json(Resultado.ok(null, 'Cliente excluido com sucesso.')); }
+    try { await this.service.excluir(req.params.id); return res.json(Resultado.ok(null, 'Cliente excluido com sucesso.')); }
     catch (e) { return next(e); }
   };
 }

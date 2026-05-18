@@ -1,18 +1,14 @@
 import { Resultado } from '../helpers/Resultado.js';
 
 export class AgendamentoController {
-  constructor({ listar, buscarPorId, criar, editar, cancelar, excluir }) {
-    this.listar = listar;
-    this.buscarPorId = buscarPorId;
-    this.criar = criar;
-    this.editar = editar;
-    this.cancelar = cancelar;
-    this.excluir = excluir;
+  /** @param {{ agendamentoService: import('../../../application/services/AgendamentoService.js').AgendamentoService }} deps */
+  constructor({ agendamentoService }) {
+    this.service = agendamentoService;
   }
 
   index = async (req, res, next) => {
     try {
-      const dados = await this.listar.executar({
+      const dados = await this.service.listar({
         ...req.paginacao,
         funcionarioId: req.query.funcionarioId,
         clienteId: req.query.clienteId,
@@ -24,26 +20,27 @@ export class AgendamentoController {
   };
 
   show = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.buscarPorId.executar(req.params.id))); } catch (e) { return next(e); }
+    try { return res.json(Resultado.ok(await this.service.buscarPorId(req.params.id))); }
+    catch (e) { return next(e); }
   };
 
   store = async (req, res, next) => {
-    try { return res.status(201).json(Resultado.ok(await this.criar.executar(req.body), 'Agendamento criado.')); }
+    try { return res.status(201).json(Resultado.ok(await this.service.criar(req.body), 'Agendamento criado.')); }
     catch (e) { return next(e); }
   };
 
   update = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.editar.executar(req.params.id, req.body), 'Agendamento atualizado.')); }
+    try { return res.json(Resultado.ok(await this.service.editar(req.params.id, req.body), 'Agendamento atualizado.')); }
     catch (e) { return next(e); }
   };
 
   cancelarAgendamento = async (req, res, next) => {
-    try { return res.json(Resultado.ok(await this.cancelar.executar(req.params.id), 'Agendamento cancelado.')); }
+    try { return res.json(Resultado.ok(await this.service.cancelar(req.params.id), 'Agendamento cancelado.')); }
     catch (e) { return next(e); }
   };
 
   destroy = async (req, res, next) => {
-    try { await this.excluir.executar(req.params.id); return res.json(Resultado.ok(null, 'Agendamento excluido.')); }
+    try { await this.service.excluir(req.params.id); return res.json(Resultado.ok(null, 'Agendamento excluido.')); }
     catch (e) { return next(e); }
   };
 }

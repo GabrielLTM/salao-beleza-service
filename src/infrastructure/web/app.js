@@ -1,8 +1,10 @@
 import express from 'express';
 import pinoHttp from 'pino-http';
+import swaggerUi from 'swagger-ui-express';
 import { env } from '../../config/env.js';
 import { tratadorDeErros } from './middlewares/tratadorDeErros.js';
 import { Resultado } from './helpers/Resultado.js';
+import { openapiSpec } from './swagger/openapi.js';
 
 import { criarRotasAuth } from './routes/auth.routes.js';
 import { criarRotasFuncionarios } from './routes/funcionarios.routes.js';
@@ -22,6 +24,17 @@ export function criarApp(container) {
   app.use(pinoHttp({ level: env.logLevel }));
 
   app.get('/saude', (_req, res) => res.json(Resultado.ok({ status: 'ok' }, 'API operacional.')));
+
+  // Swagger UI em /docs e spec JSON cru em /docs.json
+  app.get('/docs.json', (_req, res) => res.json(openapiSpec));
+  app.use(
+    '/docs',
+    swaggerUi.serve,
+    swaggerUi.setup(openapiSpec, {
+      customSiteTitle: 'Salao API - Docs',
+      swaggerOptions: { persistAuthorization: true },
+    }),
+  );
 
   const { autenticar, controllers } = container;
 

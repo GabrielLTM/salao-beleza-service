@@ -17,16 +17,15 @@ function obterPeriodoDaQuery(req) {
 }
 
 export class AnaliseController {
-  constructor({ desempenhoPorFuncionario, servicosMaisVendidos, faturamentoPorPeriodo }) {
-    this.desempenhoPorFuncionario = desempenhoPorFuncionario;
-    this.servicosMaisVendidos = servicosMaisVendidos;
-    this.faturamentoPorPeriodo = faturamentoPorPeriodo;
+  /** @param {{ analiseService: import('../../../application/services/AnaliseService.js').AnaliseService }} deps */
+  constructor({ analiseService }) {
+    this.service = analiseService;
   }
 
   funcionarios = async (req, res, next) => {
     try {
       const periodo = obterPeriodoDaQuery(req);
-      return res.json(Resultado.ok(await this.desempenhoPorFuncionario.executar(periodo)));
+      return res.json(Resultado.ok(await this.service.desempenhoPorFuncionario(periodo)));
     } catch (e) { return next(e); }
   };
 
@@ -34,14 +33,14 @@ export class AnaliseController {
     try {
       const periodo = obterPeriodoDaQuery(req);
       const limite = Math.min(Math.max(Number.parseInt(req.query.limite, 10) || 10, 1), 50);
-      return res.json(Resultado.ok(await this.servicosMaisVendidos.executar({ ...periodo, limite })));
+      return res.json(Resultado.ok(await this.service.servicosMaisVendidos({ ...periodo, limite })));
     } catch (e) { return next(e); }
   };
 
   faturamento = async (req, res, next) => {
     try {
       const periodo = obterPeriodoDaQuery(req);
-      return res.json(Resultado.ok(await this.faturamentoPorPeriodo.executar(periodo)));
+      return res.json(Resultado.ok(await this.service.faturamentoPorPeriodo(periodo)));
     } catch (e) { return next(e); }
   };
 }

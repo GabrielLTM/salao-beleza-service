@@ -18,6 +18,7 @@ Front-end (responsabilidade de outro time) consome este backend respeitando o co
 - JWT + bcrypt para autenticacao
 - Zod para validacao de input
 - Pino para logs
+- Swagger UI (`swagger-ui-express`) servida em `/docs`
 
 ---
 
@@ -26,9 +27,21 @@ Front-end (responsabilidade de outro time) consome este backend respeitando o co
 ```
 src/
   domain/          regras de negocio puras (entidades, value objects, erros, contratos)
-  application/     casos de uso (1 arquivo por operacao), DTOs, mappers
-  infrastructure/  Prisma (repos), seguranca (bcrypt/jwt), Express (controllers, rotas, middlewares)
-  composition/     raiz de composicao (DI manual)
+  application/
+    services/      1 service por recurso, concentra todas as operacoes (listar, buscar, criar, editar, excluir)
+    mappers/       conversao entre registro persistido e DTO da API
+  infrastructure/
+    database/      cliente Prisma
+    repositories/  PrismaXRepository (implementam contratos do dominio)
+    security/      BcryptHasher, JwtTokenService
+    validation/    schemas Zod por recurso
+    web/
+      controllers/ recebem services via DI, orquestram req/res
+      routes/      rotas Express por recurso
+      middlewares/ autenticar, autorizar, validar, paginacao, tratadorDeErros
+      swagger/     spec OpenAPI 3 servida em /docs
+      helpers/     envelope Resultado
+  composition/     raiz de composicao (DI manual) - container.js
   config/          parsing/validacao das envs
   main.js          entry point
 prisma/
@@ -36,8 +49,8 @@ prisma/
   seed.js          cria administrador inicial
 ```
 
-Dependencias **sempre apontam para dentro**: controllers/rotas → use cases → entidades/contratos.
-Implementacoes concretas (Prisma, bcrypt, JWT) ficam em `infrastructure` e sao injetadas pelo `container.js`.
+Dependencias **sempre apontam para dentro**: controllers/rotas → services → entidades/contratos.
+Cada **Service** concentra todas as operacoes de banco daquele recurso (em vez de 1 arquivo por operacao). Implementacoes concretas (Prisma, bcrypt, JWT) ficam em `infrastructure` e sao injetadas pelo `container.js`.
 
 ---
 
@@ -94,6 +107,13 @@ npm run dev
 ```
 
 A API escuta em `http://localhost:3000`.
+
+### 7) Documentacao Swagger
+
+Apos subir o servidor, abrir no navegador:
+
+- **`http://localhost:3000/docs`** — interface Swagger UI interativa (clique em **Authorize** e cole `Bearer <token>` para testar endpoints autenticados).
+- `http://localhost:3000/docs.json` — spec OpenAPI 3 cru (JSON), util para importar em Postman/Insomnia.
 
 ---
 
@@ -262,8 +282,9 @@ Em erros de validacao (`422`), conflito (`409`), nao encontrado (`404`), nao aut
 
 ## Convencoes de codigo (Clean Code + SOLID)
 
-- **1 use case = 1 arquivo = 1 responsabilidade** (SRP).
-- Use cases dependem **somente de interfaces de repositorio** (DIP). `infrastructure/repositories/Prisma*` injeta a implementacao concreta.
+- **1 Service por recurso = 1 classe com todas as operacoes do banco** (listar, buscarPorId, criar, editar, excluir, etc). Cada metodo segue SRP internamente.
+- Services dependem **somente de interfaces de repositorio** (DIP). `infrastructure/repositories/Prisma*` injeta a implementacao concreta.
+- Controllers sao **finos** — apenas orquestram `req` → `service.metodo(...)` → `Resultado.ok(...)`.
 - Erros de dominio (`ValidationError`, `NotFoundError`, `ConflictError`, `Unauthorized/ForbiddenError`) sao traduzidos automaticamente para HTTP pelo `tratadorDeErros`.
 - Mappers (`application/mappers/*`) cuidam de conversao entre registro persistido e DTO da API.
 - IDs sao GUID (string UUID v4) gerados via `crypto.randomUUID()`.
@@ -280,5 +301,5 @@ npm run prisma:generate  # gerar Prisma Client
 npm run prisma:push      # aplicar schema no Atlas
 npm run prisma:studio    # abrir Prisma Studio
 npm run lint             # eslint
-npm test                 # jest (a suite cobre os use cases principais)
+npm test                 # jest (suite cobre os services principais)
 ```

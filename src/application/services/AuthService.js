@@ -1,10 +1,11 @@
-import { UnauthorizedError } from '../../../domain/errors/UnauthorizedError.js';
-import { Status } from '../../../domain/value-objects/Status.js';
+import { UnauthorizedError } from '../../domain/errors/UnauthorizedError.js';
+import { Status } from '../../domain/value-objects/Status.js';
 
 /**
- * Caso de uso: autentica um funcionario por email/senha e retorna um JWT.
+ * Servico de autenticacao.
+ * Concentra regras de login do funcionario.
  */
-export class LoginFuncionario {
+export class AuthService {
   /**
    * @param {{ funcionarioRepository:any, hasher:any, tokenService:any }} deps
    */
@@ -14,7 +15,7 @@ export class LoginFuncionario {
     this.tokenService = tokenService;
   }
 
-  async executar({ email, senha }) {
+  async login({ email, senha }) {
     if (!email || !senha) {
       throw new UnauthorizedError('Email e senha sao obrigatorios.');
     }
