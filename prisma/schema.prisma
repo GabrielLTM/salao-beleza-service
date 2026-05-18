@@ -1,0 +1,112 @@
+// Schema Prisma para MongoDB Atlas.
+// IDs são GUID (string UUID v4) por imposição do contrato com o front (Regra geral.txt).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Funcionario {
+  id              String              @id @default(uuid()) @map("_id")
+  nomeCompleto    String
+  endereco        String?
+  telefone        String?
+  profissaoCargo  String
+  email           String              @unique
+  senhaHash       String
+  dataNascimento  DateTime?
+  nivelPermissao  Int
+  status          Int
+  agendas         AgendaFuncionario[]
+  agendamentos    Agendamento[]
+  vendas          Venda[]
+}
+
+model Cliente {
+  id             String        @id @default(uuid()) @map("_id")
+  nomeCompleto   String
+  whatsApp       String
+  dataNascimento DateTime?
+  endereco       String?
+  agendamentos   Agendamento[]
+  vendas         Venda[]
+}
+
+model Categoria {
+  id       String    @id @default(uuid()) @map("_id")
+  nome     String
+  servicos Servico[]
+}
+
+model Servico {
+  id             String        @id @default(uuid()) @map("_id")
+  nome           String
+  duracaoMinutos Int
+  precoMinimo    Decimal
+  categoriaId    String
+  categoria      Categoria     @relation(fields: [categoriaId], references: [id])
+  status         Int
+  agendamentos   Agendamento[]
+  itensVenda     ItemVenda[]
+}
+
+model Produto {
+  id            String      @id @default(uuid()) @map("_id")
+  nome          String
+  valor         Decimal
+  caminhoImagem String?
+  status        Int
+  itensVenda    ItemVenda[]
+}
+
+model Venda {
+  id            String      @id @default(uuid()) @map("_id")
+  dataHora      DateTime    @default(now())
+  total         Decimal
+  funcionarioId String
+  clienteId     String?
+  funcionario   Funcionario @relation(fields: [funcionarioId], references: [id])
+  cliente       Cliente?    @relation(fields: [clienteId], references: [id])
+  itens         ItemVenda[]
+}
+
+model ItemVenda {
+  id            String   @id @default(uuid()) @map("_id")
+  vendaId       String
+  tipo          String
+  produtoId     String?
+  servicoId     String?
+  quantidade    Int
+  valorUnitario Decimal
+  venda         Venda    @relation(fields: [vendaId], references: [id])
+  produto       Produto? @relation(fields: [produtoId], references: [id])
+  servico       Servico? @relation(fields: [servicoId], references: [id])
+}
+
+model AgendaFuncionario {
+  id            String      @id @default(uuid()) @map("_id")
+  funcionarioId String
+  diaSemana     Int
+  horaInicio    String
+  horaFim       String
+  funcionario   Funcionario @relation(fields: [funcionarioId], references: [id])
+}
+
+model Agendamento {
+  id             String      @id @default(uuid()) @map("_id")
+  clienteId      String
+  funcionarioId  String
+  servicoId      String
+  dataHoraInicio DateTime
+  dataHoraFim    DateTime
+  status         String
+  cliente        Cliente     @relation(fields: [clienteId], references: [id])
+  funcionario    Funcionario @relation(fields: [funcionarioId], references: [id])
+  servico        Servico     @relation(fields: [servicoId], references: [id])
+
+  @@index([funcionarioId, dataHoraInicio, dataHoraFim])
+}

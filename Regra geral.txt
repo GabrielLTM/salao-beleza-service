@@ -1,0 +1,91 @@
+Regra geral:
+- O front envia e espera receber JSON com os MESMOS nomes dos campos abaixo.
+- No JSON da API se possível ser em camelCase, tipo assim: NomeCompleto → nomeCompleto
+- Respostas podem vir dentro de: { sucesso, mensagem, erros, dados } (nosso front tem um classe resultado).
+
+CRUD padrão por módulo:
+  GET    /{recurso}            lista paginada
+  GET    /{recurso}/{id}       um registro
+  POST   /{recurso}            criar (body Cadastro)
+  PUT    /{recurso}/{id}       editar (body Edição, com id)
+  DELETE /{recurso}/{id}       excluir
+
+Rotas: funcionarios / clientes / produtos / categorias / servicos
+
+FUNCIONÁRIOS (/funcionarios)
+Ao listar, buscar ou salvar, temos esses campos:
+
+  Leitura (FuncionarioDto):
+    id, nomeCompleto, endereco, telefone, profissaoCargo, email,
+    dataNascimento, nivelPermissao, status
+
+  Criar (FuncionarioCadastroDto) — POST body:
+    nomeCompleto, endereco, telefone, profissaoCargo, email,
+    dataNascimento, nivelPermissao, status
+
+  Editar (FuncionarioEdicaoDto) — PUT body:
+    id + os mesmos campos do cadastro
+
+  nivelPermissao (número): 1=Recepcao, 2=Profissional, 3=Gerente, 4=Administrador (ainda estamos validando se precisa de 4 níveis mesmo.)
+  status (número): 0=Inativo, 1=Ativo
+
+CLIENTES (/clientes)
+
+(Cliente nao tem email no front.)
+
+  Leitura:
+    id, nomeCompleto, whatsApp, dataNascimento, endereco
+
+  Criar:
+    nomeCompleto, whatsApp, dataNascimento, endereco
+
+  Editar:
+    id + os mesmos campos do cadastro
+
+  
+PRODUTOS (/produtos)
+
+  Leitura:
+    id, nome, valor, caminhoImagem, status
+
+  Criar:
+    nome, valor, caminhoImagem, status
+
+  Editar:
+    id + os mesmos campos do cadastro
+
+  status: 0=Inativo, 1=Ativo
+
+
+SERVIÇOS (/servicos)
+
+  Leitura:
+    id, nome, duracaoMinutos, precoMinimo, categoriaId, nomeCategoria, status
+
+  Criar:
+    nome, duracaoMinutos, precoMinimo, categoriaId, status
+
+  Editar:
+    id + os mesmos campos do cadastro
+
+  nomeCategoria: só para exibir na lista (pode vir preenchido na leitura).
+  categoriaId: obrigatório ao salvar.
+
+
+CATEGORIAS (/categorias)
+
+  Leitura:
+    id, nome, servicoIds, nomesServicosVinculados
+
+  Criar:
+    nome, servicoIds (lista de GUIDs dos serviços vinculados)
+
+  Editar:
+    id + nome + servicoIds
+
+  nomesServicosVinculados: só para exibir (nomes dos serviços na tela).
+
+detalhes:
+- id sempre GUID.
+- dataNascimento: data ISO ou null.
+- valor / precoMinimo: decimal.
