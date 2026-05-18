@@ -46,7 +46,7 @@ model Servico {
   id             String        @id @default(uuid()) @map("_id")
   nome           String
   duracaoMinutos Int
-  precoMinimo    Decimal
+  precoMinimo    Float
   categoriaId    String
   categoria      Categoria     @relation(fields: [categoriaId], references: [id])
   status         Int
@@ -57,7 +57,7 @@ model Servico {
 model Produto {
   id            String      @id @default(uuid()) @map("_id")
   nome          String
-  valor         Decimal
+  valor         Float
   caminhoImagem String?
   status        Int
   itensVenda    ItemVenda[]
@@ -66,7 +66,7 @@ model Produto {
 model Venda {
   id            String      @id @default(uuid()) @map("_id")
   dataHora      DateTime    @default(now())
-  total         Decimal
+  total         Float
   funcionarioId String
   clienteId     String?
   funcionario   Funcionario @relation(fields: [funcionarioId], references: [id])
@@ -81,7 +81,7 @@ model ItemVenda {
   produtoId     String?
   servicoId     String?
   quantidade    Int
-  valorUnitario Decimal
+  valorUnitario Float
   venda         Venda    @relation(fields: [vendaId], references: [id])
   produto       Produto? @relation(fields: [produtoId], references: [id])
   servico       Servico? @relation(fields: [servicoId], references: [id])
