@@ -1,4 +1,5 @@
 import express from 'express';
+import cors from 'cors';
 import pinoHttp from 'pino-http';
 import swaggerUi from 'swagger-ui-express';
 import { env } from '../../config/env.js';
@@ -20,6 +21,13 @@ import { criarRotasAnalise } from './routes/analise.routes.js';
 export function criarApp(container) {
   const app = express();
 
+  app.use(
+    cors({
+      origin: env.corsOrigins,
+      methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+      allowedHeaders: ['Content-Type', 'Authorization'],
+    }),
+  );
   app.use(express.json({ limit: '1mb' }));
   app.use(pinoHttp({ level: env.logLevel }));
 
