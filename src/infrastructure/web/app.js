@@ -18,6 +18,14 @@ import { criarRotasAgenda } from './routes/agenda.routes.js';
 import { criarRotasAgendamentos } from './routes/agendamentos.routes.js';
 import { criarRotasAnalise } from './routes/analise.routes.js';
 
+function urlPublica(req) {
+  const proto = (req.headers['x-forwarded-proto'] || req.protocol || 'http')
+    .split(',')[0]
+    .trim();
+  const host = req.headers['x-forwarded-host'] || req.get('host');
+  return `${proto}://${host}`;
+}
+
 export function criarApp(container) {
   const app = express();
 
@@ -33,14 +41,18 @@ export function criarApp(container) {
 
   app.get('/saude', (_req, res) => res.json(Resultado.ok({ status: 'ok' }, 'API operacional.')));
 
-  // Swagger UI em /docs e spec JSON cru em /docs.json
-  app.get('/docs.json', (_req, res) => res.json(openapiSpec));
+  // Swagger UI em /docs e spec JSON cru em /docs.json.
+  // servers[] e injetado pelo host/protocolo da requisicao para o "Try it out"
+  // funcionar atras de proxy HTTPS (Render), evitando mixed content com localhost.
+  app.get('/docs.json', (req, res) =>
+    res.json({ ...openapiSpec, servers: [{ url: urlPublica(req), description: 'Atual' }] }),
+  );
   app.use(
     '/docs',
     swaggerUi.serve,
-    swaggerUi.setup(openapiSpec, {
+    swaggerUi.setup(null, {
       customSiteTitle: 'Salao API - Docs',
-      swaggerOptions: { persistAuthorization: true },
+      swaggerOptions: { url: '/docs.json', persistAuthorization: true },
     }),
   );
 

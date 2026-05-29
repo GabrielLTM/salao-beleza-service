@@ -10,9 +10,6 @@ export const openapiSpec = {
     description:
       'API REST para controle de funcionarios, clientes, produtos, categorias, servicos, vendas, agenda e agendamentos de um salao de beleza.',
   },
-  servers: [
-    { url: 'http://localhost:3000', description: 'Local' },
-  ],
   components: {
     securitySchemes: {
       bearerAuth: {

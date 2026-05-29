@@ -21,7 +21,7 @@ export const env = Object.freeze({
   port: Number.parseInt(opcional('PORT', '3000'), 10),
   nodeEnv: opcional('NODE_ENV', 'development'),
   logLevel: opcional('LOG_LEVEL', 'info'),
-  corsOrigins: opcional('CORS_ORIGINS', 'http://localhost:5086')
+  corsOrigins: opcional('CORS_ORIGINS', 'http://localhost:4200,http://localhost:5086')
     .split(',')
     .map((o) => o.trim())
     .filter(Boolean),
