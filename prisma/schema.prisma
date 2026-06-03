@@ -13,12 +13,15 @@ datasource db {
 model Funcionario {
   id              String              @id @default(uuid()) @map("_id")
   nomeCompleto    String
+  cpf             String?             @unique
   endereco        String?
   telefone        String?
-  profissaoCargo  String
+  celular         String?
+  profissoes      String[]
   email           String              @unique
   senhaHash       String
   dataNascimento  DateTime?
+  dataAdmissao    DateTime?
   nivelPermissao  Int
   status          Int
   agendas         AgendaFuncionario[]
@@ -30,6 +33,10 @@ model Cliente {
   id             String        @id @default(uuid()) @map("_id")
   nomeCompleto   String
   whatsApp       String
+  profissao      String[]
+  email          String?
+  instagram      String?
+  facebook       String?
   dataNascimento DateTime?
   endereco       String?
   agendamentos   Agendamento[]
@@ -50,7 +57,8 @@ model Servico {
   categoriaId    String
   categoria      Categoria     @relation(fields: [categoriaId], references: [id])
   status         Int
-  agendamentos   Agendamento[]
+  agendamentoIds String[]
+  agendamentos   Agendamento[] @relation(fields: [agendamentoIds], references: [id])
   itensVenda     ItemVenda[]
 }
 
@@ -100,13 +108,13 @@ model Agendamento {
   id             String      @id @default(uuid()) @map("_id")
   clienteId      String
   funcionarioId  String
-  servicoId      String
+  servicoIds     String[]
   dataHoraInicio DateTime
   dataHoraFim    DateTime
   status         String
   cliente        Cliente     @relation(fields: [clienteId], references: [id])
   funcionario    Funcionario @relation(fields: [funcionarioId], references: [id])
-  servico        Servico     @relation(fields: [servicoId], references: [id])
+  servicos       Servico[]   @relation(fields: [servicoIds], references: [id])
 
   @@index([funcionarioId, dataHoraInicio, dataHoraFim])
 }

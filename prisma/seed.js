@@ -18,7 +18,7 @@ async function main() {
     data: {
       id: randomUUID(),
       nomeCompleto: 'Administrador',
-      profissaoCargo: 'Administrador',
+      profissoes: ['Administrador'],
       email: ADMIN_EMAIL,
       senhaHash,
       nivelPermissao: 4,

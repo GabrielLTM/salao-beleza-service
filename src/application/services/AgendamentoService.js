@@ -52,7 +52,7 @@ export class AgendamentoService {
     const a = new Agendamento({
       clienteId: entrada.clienteId,
       funcionarioId: entrada.funcionarioId,
-      servicoId: entrada.servicoId,
+      servicoIds: entrada.servicoIds,
       dataHoraInicio,
       dataHoraFim,
       status: StatusAgendamento.AGENDADO,
@@ -62,7 +62,7 @@ export class AgendamentoService {
       id: a.id,
       clienteId: a.clienteId,
       funcionarioId: a.funcionarioId,
-      servicoId: a.servicoId,
+      servicoIds: a.servicoIds,
       dataHoraInicio: a.dataHoraInicio,
       dataHoraFim: a.dataHoraFim,
       status: a.status,
@@ -80,7 +80,7 @@ export class AgendamentoService {
       id,
       clienteId: entrada.clienteId,
       funcionarioId: entrada.funcionarioId,
-      servicoId: entrada.servicoId,
+      servicoIds: entrada.servicoIds,
       dataHoraInicio,
       dataHoraFim,
       status: entrada.status ?? atual.status,
@@ -90,7 +90,7 @@ export class AgendamentoService {
       id: a.id,
       clienteId: a.clienteId,
       funcionarioId: a.funcionarioId,
-      servicoId: a.servicoId,
+      servicoIds: a.servicoIds,
       dataHoraInicio: a.dataHoraInicio,
       dataHoraFim: a.dataHoraFim,
       status: a.status,
@@ -113,19 +113,27 @@ export class AgendamentoService {
 
   /**
    * Valida regras de negocio do agendamento:
-   * 1. Cliente, funcionario e servico existem.
-   * 2. Periodo cabe em alguma janela da agenda do funcionario para o dia.
-   * 3. Sem sobreposicao com outro agendamento ativo.
+   * 1. Cliente, funcionario e todos os servicos existem.
+   * 2. A duracao total e a soma das duracoes dos servicos selecionados.
+   * 3. Periodo cabe em alguma janela da agenda do funcionario para o dia.
+   * 4. Sem sobreposicao com outro agendamento ativo.
    */
   async _validarConflito(entrada, idEditando) {
-    const [cliente, funcionario, servico] = await Promise.all([
+    const servicoIds = Array.isArray(entrada.servicoIds) ? entrada.servicoIds : [];
+    if (servicoIds.length === 0) {
+      throw new ConflictError('servicoIds deve conter pelo menos um servico.');
+    }
+
+    const [cliente, funcionario, servicos] = await Promise.all([
       this.clienteRepository.buscarPorId(entrada.clienteId),
       this.funcionarioRepository.buscarPorId(entrada.funcionarioId),
-      this.servicoRepository.buscarPorId(entrada.servicoId),
+      this.servicoRepository.buscarVariosPorIds(servicoIds),
     ]);
     if (!cliente) throw new NotFoundError('Cliente nao encontrado.');
     if (!funcionario) throw new NotFoundError('Funcionario nao encontrado.');
-    if (!servico) throw new NotFoundError('Servico nao encontrado.');
+    if (servicos.length !== new Set(servicoIds).size) {
+      throw new NotFoundError('Um ou mais servicos nao foram encontrados.');
+    }
 
     const inicio = entrada.dataHoraInicio instanceof Date
       ? entrada.dataHoraInicio
@@ -133,7 +141,8 @@ export class AgendamentoService {
     if (Number.isNaN(inicio.getTime())) {
       throw new ConflictError('dataHoraInicio invalida.');
     }
-    const fim = new Date(inicio.getTime() + servico.duracaoMinutos * 60_000);
+    const duracaoTotal = servicos.reduce((acc, s) => acc + s.duracaoMinutos, 0);
+    const fim = new Date(inicio.getTime() + duracaoTotal * 60_000);
 
     const diaSemana = inicio.getDay();
     const janelas = await this.agendaRepository.listarPorFuncionarioEDia(entrada.funcionarioId, diaSemana);
@@ -157,6 +166,6 @@ export class AgendamentoService {
       throw new ConflictError('Conflito com outro agendamento existente para o funcionario.');
     }
 
-    return { dataHoraInicio: inicio, dataHoraFim: fim, servico };
+    return { dataHoraInicio: inicio, dataHoraFim: fim, servicos };
   }
 }

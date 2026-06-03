@@ -8,11 +8,14 @@ export const FuncionarioMapper = {
     return {
       id: f.id,
       nomeCompleto: f.nomeCompleto,
+      cpf: f.cpf ?? null,
       endereco: f.endereco ?? null,
       telefone: f.telefone ?? null,
-      profissaoCargo: f.profissaoCargo,
+      celular: f.celular ?? null,
+      profissoes: f.profissoes ?? [],
       email: f.email,
       dataNascimento: f.dataNascimento ? new Date(f.dataNascimento).toISOString() : null,
+      dataAdmissao: f.dataAdmissao ? new Date(f.dataAdmissao).toISOString() : null,
       nivelPermissao: f.nivelPermissao,
       status: f.status,
     };

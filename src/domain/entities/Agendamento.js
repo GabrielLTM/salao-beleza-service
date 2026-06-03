@@ -12,7 +12,7 @@ export class Agendamento {
     id = randomUUID(),
     clienteId,
     funcionarioId,
-    servicoId,
+    servicoIds,
     dataHoraInicio,
     dataHoraFim,
     status = StatusAgendamento.AGENDADO,
@@ -20,7 +20,9 @@ export class Agendamento {
     const erros = [];
     if (!clienteId) erros.push('clienteId eh obrigatorio.');
     if (!funcionarioId) erros.push('funcionarioId eh obrigatorio.');
-    if (!servicoId) erros.push('servicoId eh obrigatorio.');
+    if (!Array.isArray(servicoIds) || servicoIds.length === 0) {
+      erros.push('servicoIds deve conter pelo menos um servico.');
+    }
     const inicio = dataHoraInicio instanceof Date ? dataHoraInicio : new Date(dataHoraInicio);
     const fim = dataHoraFim instanceof Date ? dataHoraFim : new Date(dataHoraFim);
     if (Number.isNaN(inicio.getTime())) erros.push('dataHoraInicio invalida.');
@@ -36,7 +38,7 @@ export class Agendamento {
     this.id = id;
     this.clienteId = clienteId;
     this.funcionarioId = funcionarioId;
-    this.servicoId = servicoId;
+    this.servicoIds = Array.isArray(servicoIds) ? [...servicoIds] : [];
     this.dataHoraInicio = inicio;
     this.dataHoraFim = fim;
     this.status = status;

@@ -24,6 +24,10 @@ export class ClienteService {
       id: cliente.id,
       nomeCompleto: cliente.nomeCompleto,
       whatsApp: cliente.whatsApp,
+      profissao: cliente.profissao,
+      email: cliente.email,
+      instagram: cliente.instagram,
+      facebook: cliente.facebook,
       dataNascimento: cliente.dataNascimento,
       endereco: cliente.endereco,
     });
@@ -38,6 +42,10 @@ export class ClienteService {
       id: cliente.id,
       nomeCompleto: cliente.nomeCompleto,
       whatsApp: cliente.whatsApp,
+      profissao: cliente.profissao,
+      email: cliente.email,
+      instagram: cliente.instagram,
+      facebook: cliente.facebook,
       dataNascimento: cliente.dataNascimento,
       endereco: cliente.endereco,
     });

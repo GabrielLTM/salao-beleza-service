@@ -26,6 +26,10 @@ export class PrismaFuncionarioRepository extends IFuncionarioRepository {
     return this.prisma.funcionario.findUnique({ where: { email } });
   }
 
+  buscarPorCpf(cpf) {
+    return this.prisma.funcionario.findUnique({ where: { cpf } });
+  }
+
   criar(registro) {
     return this.prisma.funcionario.create({ data: registro });
   }

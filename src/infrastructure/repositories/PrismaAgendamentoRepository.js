@@ -31,11 +31,19 @@ export class PrismaAgendamentoRepository extends IAgendamentoRepository {
     return this.prisma.agendamento.findUnique({ where: { id } });
   }
 
-  criar(registro) { return this.prisma.agendamento.create({ data: registro }); }
+  criar(registro) {
+    const { servicoIds = [], ...resto } = registro;
+    return this.prisma.agendamento.create({
+      data: { ...resto, servicos: { connect: servicoIds.map((sid) => ({ id: sid })) } },
+    });
+  }
 
   atualizar(registro) {
-    const { id, ...resto } = registro;
-    return this.prisma.agendamento.update({ where: { id }, data: resto });
+    const { id, servicoIds = [], ...resto } = registro;
+    return this.prisma.agendamento.update({
+      where: { id },
+      data: { ...resto, servicos: { set: servicoIds.map((sid) => ({ id: sid })) } },
+    });
   }
 
   cancelar(id) {

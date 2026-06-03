@@ -3,6 +3,10 @@
  * @property {string} id
  * @property {string} nomeCompleto
  * @property {string} whatsApp
+ * @property {string|null} profissao
+ * @property {string|null} email
+ * @property {string|null} instagram
+ * @property {string|null} facebook
  * @property {Date|null} dataNascimento
  * @property {string|null} endereco
  */

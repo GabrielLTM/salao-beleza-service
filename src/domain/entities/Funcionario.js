@@ -5,36 +5,54 @@ import { validarStatus, Status } from '../value-objects/Status.js';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+function normalizarCpf(cpf) {
+  if (cpf == null) return null;
+  const apenasDigitos = String(cpf).replace(/\D/g, '');
+  return apenasDigitos.length > 0 ? apenasDigitos : null;
+}
+
 export class Funcionario {
   constructor({
     id = randomUUID(),
     nomeCompleto,
+    cpf = null,
     endereco = null,
     telefone = null,
-    profissaoCargo,
+    celular = null,
+    profissoes,
     email,
     senhaHash,
     dataNascimento = null,
+    dataAdmissao = null,
     nivelPermissao,
     status,
   }) {
-    Funcionario.validar({ nomeCompleto, profissaoCargo, email, nivelPermissao, status });
+    Funcionario.validar({ nomeCompleto, cpf, profissoes, email, nivelPermissao, status });
     this.id = id;
     this.nomeCompleto = nomeCompleto.trim();
+    this.cpf = normalizarCpf(cpf);
     this.endereco = endereco?.trim() ?? null;
     this.telefone = telefone?.trim() ?? null;
-    this.profissaoCargo = profissaoCargo.trim();
+    this.celular = celular?.trim() ?? null;
+    this.profissoes = profissoes.map((p) => p.trim()).filter((p) => p.length > 0);
     this.email = email.trim().toLowerCase();
     this.senhaHash = senhaHash;
     this.dataNascimento = dataNascimento ? new Date(dataNascimento) : null;
+    this.dataAdmissao = dataAdmissao ? new Date(dataAdmissao) : null;
     this.nivelPermissao = nivelPermissao;
     this.status = status;
   }
 
-  static validar({ nomeCompleto, profissaoCargo, email, nivelPermissao, status }) {
+  static validar({ nomeCompleto, cpf, profissoes, email, nivelPermissao, status }) {
     const erros = [];
     if (!nomeCompleto || nomeCompleto.trim().length < 2) erros.push('nomeCompleto eh obrigatorio.');
-    if (!profissaoCargo || profissaoCargo.trim().length < 2) erros.push('profissaoCargo eh obrigatorio.');
+    const cpfNormalizado = normalizarCpf(cpf);
+    if (cpfNormalizado !== null && cpfNormalizado.length !== 11) {
+      erros.push('cpf deve conter 11 digitos.');
+    }
+    if (!Array.isArray(profissoes) || profissoes.filter((p) => p && p.trim().length >= 2).length === 0) {
+      erros.push('profissoes deve conter pelo menos uma profissao valida.');
+    }
     if (!email || !EMAIL_REGEX.test(email)) erros.push('email invalido.');
     if (erros.length > 0) throw new ValidationError('Funcionario invalido.', erros);
     validarNivelPermissao(nivelPermissao);

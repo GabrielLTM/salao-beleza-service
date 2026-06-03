@@ -37,15 +37,24 @@ export class FuncionarioService {
 
     const senhaHash = await this.hasher.hash(entrada.senha);
     const funcionario = new Funcionario({ ...entrada, senhaHash });
+
+    if (funcionario.cpf) {
+      const cpfExistente = await this.funcionarioRepository.buscarPorCpf(funcionario.cpf);
+      if (cpfExistente) throw new ConflictError('Ja existe funcionario com este cpf.');
+    }
+
     const salvo = await this.funcionarioRepository.criar({
       id: funcionario.id,
       nomeCompleto: funcionario.nomeCompleto,
+      cpf: funcionario.cpf,
       endereco: funcionario.endereco,
       telefone: funcionario.telefone,
-      profissaoCargo: funcionario.profissaoCargo,
+      celular: funcionario.celular,
+      profissoes: funcionario.profissoes,
       email: funcionario.email,
       senhaHash: funcionario.senhaHash,
       dataNascimento: funcionario.dataNascimento,
+      dataAdmissao: funcionario.dataAdmissao,
       nivelPermissao: funcionario.nivelPermissao,
       status: funcionario.status,
     });
@@ -67,15 +76,25 @@ export class FuncionarioService {
     const senhaHash = entrada.senha ? await this.hasher.hash(entrada.senha) : atual.senhaHash;
     const funcionario = new Funcionario({ ...entrada, id, senhaHash });
 
+    if (funcionario.cpf && funcionario.cpf !== atual.cpf) {
+      const cpfDuplicado = await this.funcionarioRepository.buscarPorCpf(funcionario.cpf);
+      if (cpfDuplicado && cpfDuplicado.id !== id) {
+        throw new ConflictError('Ja existe outro funcionario com este cpf.');
+      }
+    }
+
     const salvo = await this.funcionarioRepository.atualizar({
       id: funcionario.id,
       nomeCompleto: funcionario.nomeCompleto,
+      cpf: funcionario.cpf,
       endereco: funcionario.endereco,
       telefone: funcionario.telefone,
-      profissaoCargo: funcionario.profissaoCargo,
+      celular: funcionario.celular,
+      profissoes: funcionario.profissoes,
       email: funcionario.email,
       senhaHash: funcionario.senhaHash,
       dataNascimento: funcionario.dataNascimento,
+      dataAdmissao: funcionario.dataAdmissao,
       nivelPermissao: funcionario.nivelPermissao,
       status: funcionario.status,
     });

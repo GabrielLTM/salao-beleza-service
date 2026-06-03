@@ -1,13 +1,22 @@
 import { z } from 'zod';
-import { dataNascimentoSchema } from './comuns.js';
+import { dataNascimentoSchema, dataOpcionalSchema } from './comuns.js';
 
 const camposComuns = {
   nomeCompleto: z.string().min(2, 'nomeCompleto deve ter pelo menos 2 caracteres.'),
+  cpf: z
+    .string()
+    .regex(/^\d{11}$/, 'cpf deve conter 11 digitos (apenas numeros).')
+    .nullable()
+    .optional(),
   endereco: z.string().nullable().optional(),
   telefone: z.string().nullable().optional(),
-  profissaoCargo: z.string().min(2, 'profissaoCargo eh obrigatorio.'),
+  celular: z.string().nullable().optional(),
+  profissoes: z
+    .array(z.string().min(2, 'cada profissao deve ter pelo menos 2 caracteres.'))
+    .min(1, 'profissoes deve conter pelo menos uma profissao.'),
   email: z.string().email('email invalido.'),
   dataNascimento: dataNascimentoSchema,
+  dataAdmissao: dataOpcionalSchema,
   nivelPermissao: z.number().int().min(1).max(4),
   status: z.number().int().min(0).max(1),
 };

@@ -5,7 +5,7 @@ export const AgendamentoMapper = {
       id: a.id,
       clienteId: a.clienteId,
       funcionarioId: a.funcionarioId,
-      servicoId: a.servicoId,
+      servicoIds: a.servicoIds ?? [],
       dataHoraInicio: a.dataHoraInicio instanceof Date ? a.dataHoraInicio.toISOString() : a.dataHoraInicio,
       dataHoraFim: a.dataHoraFim instanceof Date ? a.dataHoraFim.toISOString() : a.dataHoraFim,
       status: a.status,

@@ -5,12 +5,15 @@
  * @typedef {object} FuncionarioRegistro
  * @property {string} id
  * @property {string} nomeCompleto
+ * @property {string|null} cpf
  * @property {string|null} endereco
  * @property {string|null} telefone
- * @property {string} profissaoCargo
+ * @property {string|null} celular
+ * @property {string[]} profissoes
  * @property {string} email
  * @property {string} senhaHash
  * @property {Date|null} dataNascimento
+ * @property {Date|null} dataAdmissao
  * @property {number} nivelPermissao
  * @property {number} status
  *
@@ -31,6 +34,8 @@ export class IFuncionarioRepository {
   async buscarPorId(_id) { throw new Error('Nao implementado'); }
   /** @param {string} _email @returns {Promise<FuncionarioRegistro|null>} */
   async buscarPorEmail(_email) { throw new Error('Nao implementado'); }
+  /** @param {string} _cpf @returns {Promise<FuncionarioRegistro|null>} */
+  async buscarPorCpf(_cpf) { throw new Error('Nao implementado'); }
   /** @param {FuncionarioRegistro} _registro @returns {Promise<FuncionarioRegistro>} */
   async criar(_registro) { throw new Error('Nao implementado'); }
   /** @param {FuncionarioRegistro} _registro @returns {Promise<FuncionarioRegistro>} */
