@@ -13,7 +13,7 @@ datasource db {
 model Funcionario {
   id              String              @id @default(uuid()) @map("_id")
   nomeCompleto    String
-  cpf             String?             @unique
+  cpf             String?
   endereco        String?
   telefone        String?
   celular         String?
