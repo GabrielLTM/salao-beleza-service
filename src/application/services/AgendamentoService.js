@@ -3,12 +3,6 @@ import { ConflictError } from '../../domain/errors/ConflictError.js';
 import { NotFoundError } from '../../domain/errors/NotFoundError.js';
 import { AgendamentoMapper } from '../mappers/AgendamentoMapper.js';
 
-function formatarHHmm(date) {
-  const h = String(date.getHours()).padStart(2, '0');
-  const m = String(date.getMinutes()).padStart(2, '0');
-  return `${h}:${m}`;
-}
-
 export class AgendamentoService {
   /**
    * @param {{
@@ -16,7 +10,6 @@ export class AgendamentoService {
    *   clienteRepository:any,
    *   funcionarioRepository:any,
    *   servicoRepository:any,
-   *   agendaRepository:any,
    * }} deps
    */
   constructor({
@@ -24,13 +17,11 @@ export class AgendamentoService {
     clienteRepository,
     funcionarioRepository,
     servicoRepository,
-    agendaRepository,
   }) {
     this.agendamentoRepository = agendamentoRepository;
     this.clienteRepository = clienteRepository;
     this.funcionarioRepository = funcionarioRepository;
     this.servicoRepository = servicoRepository;
-    this.agendaRepository = agendaRepository;
   }
 
   async listar({ pagina, tamanho, funcionarioId, clienteId, inicio, fim }) {
@@ -115,8 +106,7 @@ export class AgendamentoService {
    * Valida regras de negocio do agendamento:
    * 1. Cliente, funcionario e todos os servicos existem.
    * 2. A duracao total e a soma das duracoes dos servicos selecionados.
-   * 3. Periodo cabe em alguma janela da agenda do funcionario para o dia.
-   * 4. Sem sobreposicao com outro agendamento ativo.
+   * 3. Sem sobreposicao com outro agendamento ativo do funcionario.
    */
   async _validarConflito(entrada, idEditando) {
     const servicoIds = Array.isArray(entrada.servicoIds) ? entrada.servicoIds : [];
@@ -143,18 +133,6 @@ export class AgendamentoService {
     }
     const duracaoTotal = servicos.reduce((acc, s) => acc + s.duracaoMinutos, 0);
     const fim = new Date(inicio.getTime() + duracaoTotal * 60_000);
-
-    const diaSemana = inicio.getDay();
-    const janelas = await this.agendaRepository.listarPorFuncionarioEDia(entrada.funcionarioId, diaSemana);
-    if (janelas.length === 0) {
-      throw new ConflictError('Funcionario sem agenda definida para o dia.');
-    }
-    const horaInicio = formatarHHmm(inicio);
-    const horaFim = formatarHHmm(fim);
-    const dentroDeJanela = janelas.some((j) => horaInicio >= j.horaInicio && horaFim <= j.horaFim);
-    if (!dentroDeJanela) {
-      throw new ConflictError('Horario fora da janela de agenda do funcionario.');
-    }
 
     const conflitos = await this.agendamentoRepository.buscarConflitos(
       entrada.funcionarioId,

@@ -78,7 +78,6 @@ export function criarContainer() {
     clienteRepository,
     funcionarioRepository,
     servicoRepository,
-    agendaRepository,
   });
   const analiseService = new AnaliseService({
     funcionarioRepository,
