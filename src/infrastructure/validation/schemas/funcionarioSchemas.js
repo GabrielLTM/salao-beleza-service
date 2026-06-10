@@ -1,10 +1,10 @@
 import { z } from 'zod';
-import { dataNascimentoSchema, dataOpcionalSchema } from './comuns.js';
+import { dataNascimentoSchema, dataOpcionalSchema, dataPassadaSchema } from './comuns.js';
 
 // Regex genérico para validar apenas letras e espaços (permite acentos)
 const apenasLetrasRegex = /^[A-Za-zÀ-ÿ\s]+$/;
 
-// Schema customizado para telefone/celular (aceita vazio/nulo, mas se preenchido exige 10-11 dígitos)
+// Schema customizado para telefone/celular
 const telefoneSchema = z
   .string()
   .trim()
@@ -50,8 +50,11 @@ const camposComuns = {
     .min(1, 'profissoes deve conter pelo menos uma profissao.'),
     
   email: z.string().trim().email('email invalido.'),
+  
+  // Aqui aplicamos as travas de datas!
   dataNascimento: dataNascimentoSchema,
-  dataAdmissao: dataOpcionalSchema,
+  dataAdmissao: dataPassadaSchema,
+  
   nivelPermissao: z.number().int().min(1).max(4),
   status: z.number().int().min(0).max(1),
 };
