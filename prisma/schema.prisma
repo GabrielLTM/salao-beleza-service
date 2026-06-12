@@ -11,22 +11,22 @@ datasource db {
 }
 
 model Funcionario {
-  id              String              @id @default(uuid()) @map("_id")
-  nomeCompleto    String
-  cpf             String?
-  endereco        String?
-  telefone        String?
-  celular         String?
-  profissoes      String[]
-  email           String              @unique
-  senhaHash       String
-  dataNascimento  DateTime?
-  dataAdmissao    DateTime?
-  nivelPermissao  Int
-  status          Int
-  agendas         AgendaFuncionario[]
-  agendamentos    Agendamento[]
-  vendas          Venda[]
+  id               String              @id @default(uuid()) @map("_id")
+  nomeCompleto     String
+  cpf              String?             @unique
+  endereco         String?
+  telefone         String?
+  celular          String?
+  profissoes       String[]
+  email            String              @unique
+  senhaHash        String
+  dataNascimento   DateTime?
+  dataAdmissao     DateTime?
+  nivelPermissao   Int
+  status           Int
+  agendas          AgendaFuncionario[]
+  agendamentos     Agendamento[]
+  vendas           Venda[]
 }
 
 model Cliente {
