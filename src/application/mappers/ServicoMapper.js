@@ -15,6 +15,7 @@ export const ServicoMapper = {
       categoriaId: s.categoriaId,
       nomeCategoria: s.categoria?.nome ?? s.nomeCategoria ?? null,
       status: s.status,
+      percentualComissao: decimalParaNumero(s.percentualComissao),
     };
   },
 };

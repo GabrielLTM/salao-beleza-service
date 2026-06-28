@@ -69,13 +69,14 @@ export const openapiSpec = {
           cpf: { type: 'string', nullable: true, description: '11 digitos (apenas numeros).' },
           endereco: { type: 'string', nullable: true },
           telefone: { type: 'string', nullable: true },
-          celular: { type: 'string', nullable: true },
           profissoes: { type: 'array', items: { type: 'string' } },
           email: { type: 'string', format: 'email' },
           dataNascimento: { type: 'string', format: 'date-time', nullable: true },
           dataAdmissao: { type: 'string', format: 'date-time', nullable: true, description: 'Data de entrada na empresa.' },
           nivelPermissao: { type: 'integer', enum: [1, 2, 3, 4], description: '1=Recepcao, 2=Profissional, 3=Gerente, 4=Administrador' },
           status: { type: 'integer', enum: [0, 1], description: '0=Inativo, 1=Ativo' },
+          percentualComissaoProduto: { type: 'number', minimum: 0, maximum: 100, description: '% que o funcionario ganha sobre o percentual de comissao do produto.' },
+          percentualComissaoServico: { type: 'number', minimum: 0, maximum: 100, description: '% que o funcionario ganha sobre o percentual de comissao do servico.' },
         },
       },
       FuncionarioCadastro: {
@@ -86,7 +87,6 @@ export const openapiSpec = {
           cpf: { type: 'string', pattern: '^\\d{11}$', nullable: true, description: '11 digitos (apenas numeros). Unico quando informado.' },
           endereco: { type: 'string', nullable: true },
           telefone: { type: 'string', nullable: true },
-          celular: { type: 'string', nullable: true },
           profissoes: { type: 'array', minItems: 1, items: { type: 'string', minLength: 2 } },
           email: { type: 'string', format: 'email' },
           senha: { type: 'string', minLength: 6 },
@@ -94,6 +94,8 @@ export const openapiSpec = {
           dataAdmissao: { type: 'string', nullable: true, description: 'Data de entrada na empresa (ISO-8601 ou YYYY-MM-DD).' },
           nivelPermissao: { type: 'integer', enum: [1, 2, 3, 4] },
           status: { type: 'integer', enum: [0, 1] },
+          percentualComissaoProduto: { type: 'number', minimum: 0, maximum: 100, default: 0 },
+          percentualComissaoServico: { type: 'number', minimum: 0, maximum: 100, default: 0 },
         },
       },
       FuncionarioEdicao: {
@@ -141,6 +143,7 @@ export const openapiSpec = {
           valor: { type: 'number' },
           caminhoImagem: { type: 'string', nullable: true },
           status: { type: 'integer', enum: [0, 1] },
+          percentualComissao: { type: 'number', minimum: 0, maximum: 100, description: '% do valor do produto que serve de base para a comissao.' },
         },
       },
       ProdutoCadastro: {
@@ -151,6 +154,7 @@ export const openapiSpec = {
           valor: { type: 'number', minimum: 0 },
           caminhoImagem: { type: 'string', nullable: true },
           status: { type: 'integer', enum: [0, 1] },
+          percentualComissao: { type: 'number', minimum: 0, maximum: 100, default: 0 },
         },
       },
       Servico: {
@@ -163,6 +167,7 @@ export const openapiSpec = {
           categoriaId: { type: 'string', format: 'uuid' },
           nomeCategoria: { type: 'string', nullable: true },
           status: { type: 'integer', enum: [0, 1] },
+          percentualComissao: { type: 'number', minimum: 0, maximum: 100, description: '% do valor do servico que serve de base para a comissao.' },
         },
       },
       ServicoCadastro: {
@@ -174,6 +179,7 @@ export const openapiSpec = {
           precoMinimo: { type: 'number', minimum: 0 },
           categoriaId: { type: 'string', format: 'uuid' },
           status: { type: 'integer', enum: [0, 1] },
+          percentualComissao: { type: 'number', minimum: 0, maximum: 100, default: 0 },
         },
       },
       Categoria: {
@@ -203,6 +209,9 @@ export const openapiSpec = {
           servicoId: { type: 'string', format: 'uuid', nullable: true },
           quantidade: { type: 'integer', minimum: 1 },
           valorUnitario: { type: 'number', minimum: 0 },
+          percentualComissaoBase: { type: 'number', readOnly: true, description: '% de comissao do item congelado na venda.' },
+          percentualComissaoFuncionario: { type: 'number', readOnly: true, description: '% do funcionario congelado na venda.' },
+          valorComissao: { type: 'number', readOnly: true, description: 'Comissao calculada: valor x %item x %funcionario.' },
         },
       },
       Venda: {
@@ -628,7 +637,7 @@ export const openapiSpec = {
     '/analise/funcionarios': {
       get: {
         tags: ['Analise'],
-        summary: 'Desempenho por funcionario no periodo (nivel >= 3)',
+        summary: 'Desempenho por funcionario no periodo (nivel >= 3). Inclui totalFaturado e comissao (total, produto, servico).',
         parameters: [
           { in: 'query', name: 'inicio', required: true, schema: { type: 'string', format: 'date-time' } },
           { in: 'query', name: 'fim', required: true, schema: { type: 'string', format: 'date-time' } },

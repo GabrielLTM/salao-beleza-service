@@ -8,7 +8,6 @@
  * @property {string|null} cpf
  * @property {string|null} endereco
  * @property {string|null} telefone
- * @property {string|null} celular
  * @property {string[]} profissoes
  * @property {string} email
  * @property {string} senhaHash
@@ -16,6 +15,8 @@
  * @property {Date|null} dataAdmissao
  * @property {number} nivelPermissao
  * @property {number} status
+ * @property {number} percentualComissaoProduto
+ * @property {number} percentualComissaoServico
  *
  * @typedef {object} ListagemArgs
  * @property {number} pagina

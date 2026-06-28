@@ -199,9 +199,13 @@ DELETE /{recurso}/{id}       exclui
   "senha": "minhasenha123",
   "dataNascimento": "1990-05-12",
   "nivelPermissao": 2,
-  "status": 1
+  "status": 1,
+  "percentualComissaoProduto": 5,
+  "percentualComissaoServico": 30
 }
 ```
+
+> `percentualComissaoProduto` / `percentualComissaoServico` (0–100, opcionais, default 0): percentual que o funcionario ganha sobre o percentual de comissao do item.
 
 **Servico (POST /servicos):**
 ```json
@@ -210,7 +214,18 @@ DELETE /{recurso}/{id}       exclui
   "duracaoMinutos": 45,
   "precoMinimo": 60.00,
   "categoriaId": "<guid-da-categoria>",
-  "status": 1
+  "status": 1,
+  "percentualComissao": 100
+}
+```
+
+**Produto (POST /produtos):**
+```json
+{
+  "nome": "Shampoo profissional",
+  "valor": 50.00,
+  "status": 1,
+  "percentualComissao": 80
 }
 ```
 
@@ -255,7 +270,11 @@ DELETE /{recurso}/{id}       exclui
 }
 ```
 
-Total eh calculado no servidor.
+Total eh calculado no servidor. A comissao de cada item tambem eh calculada e congelada na venda
+(snapshot dos percentuais vigentes): `valorComissao = valorUnitario x quantidade x (%item/100) x (%funcionario/100)`.
+Ex.: produto a 80% + funcionario a 5% sobre R$ 100 = R$ 4,00. Os campos `percentualComissaoBase`,
+`percentualComissaoFuncionario` e `valorComissao` retornam em cada item da venda, e o total por
+funcionario aparece em `GET /analise/funcionarios` (`totalComissao`, `comissaoProduto`, `comissaoServico`).
 
 ---
 

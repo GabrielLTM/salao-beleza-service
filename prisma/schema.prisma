@@ -11,22 +11,23 @@ datasource db {
 }
 
 model Funcionario {
-  id               String              @id @default(uuid()) @map("_id")
-  nomeCompleto     String
-  cpf              String?             @unique
-  endereco         String?
-  telefone         String?
-  celular          String?
-  profissoes       String[]
-  email            String              @unique
-  senhaHash        String
-  dataNascimento   DateTime?
-  dataAdmissao     DateTime?
-  nivelPermissao   Int
-  status           Int
-  agendas          AgendaFuncionario[]
-  agendamentos     Agendamento[]
-  vendas           Venda[]
+  id                        String              @id @default(uuid()) @map("_id")
+  nomeCompleto              String
+  cpf                       String?             @unique
+  endereco                  String?
+  telefone                  String?
+  profissoes                String[]
+  email                     String              @unique
+  senhaHash                 String
+  dataNascimento            DateTime?
+  dataAdmissao              DateTime?
+  nivelPermissao            Int
+  status                    Int
+  percentualComissaoProduto Float               @default(0)
+  percentualComissaoServico Float               @default(0)
+  agendas                   AgendaFuncionario[]
+  agendamentos              Agendamento[]
+  vendas                    Venda[]
 }
 
 model Cliente {
@@ -50,25 +51,27 @@ model Categoria {
 }
 
 model Servico {
-  id             String        @id @default(uuid()) @map("_id")
-  nome           String
-  duracaoMinutos Int
-  precoMinimo    Float
-  categoriaId    String
-  categoria      Categoria     @relation(fields: [categoriaId], references: [id])
-  status         Int
-  agendamentoIds String[]
-  agendamentos   Agendamento[] @relation(fields: [agendamentoIds], references: [id])
-  itensVenda     ItemVenda[]
+  id                 String        @id @default(uuid()) @map("_id")
+  nome               String
+  duracaoMinutos     Int
+  precoMinimo        Float
+  categoriaId        String
+  categoria          Categoria     @relation(fields: [categoriaId], references: [id])
+  status             Int
+  percentualComissao Float         @default(0)
+  agendamentoIds     String[]
+  agendamentos       Agendamento[] @relation(fields: [agendamentoIds], references: [id])
+  itensVenda         ItemVenda[]
 }
 
 model Produto {
-  id            String      @id @default(uuid()) @map("_id")
-  nome          String
-  valor         Float
-  caminhoImagem String?
-  status        Int
-  itensVenda    ItemVenda[]
+  id                 String      @id @default(uuid()) @map("_id")
+  nome               String
+  valor              Float
+  caminhoImagem      String?
+  status             Int
+  percentualComissao Float       @default(0)
+  itensVenda         ItemVenda[]
 }
 
 model Venda {
@@ -83,16 +86,19 @@ model Venda {
 }
 
 model ItemVenda {
-  id            String   @id @default(uuid()) @map("_id")
-  vendaId       String
-  tipo          String
-  produtoId     String?
-  servicoId     String?
-  quantidade    Int
-  valorUnitario Float
-  venda         Venda    @relation(fields: [vendaId], references: [id])
-  produto       Produto? @relation(fields: [produtoId], references: [id])
-  servico       Servico? @relation(fields: [servicoId], references: [id])
+  id                            String   @id @default(uuid()) @map("_id")
+  vendaId                       String
+  tipo                          String
+  produtoId                     String?
+  servicoId                     String?
+  quantidade                    Int
+  valorUnitario                 Float
+  percentualComissaoBase        Float    @default(0)
+  percentualComissaoFuncionario Float    @default(0)
+  valorComissao                 Float    @default(0)
+  venda                         Venda    @relation(fields: [vendaId], references: [id])
+  produto                       Produto? @relation(fields: [produtoId], references: [id])
+  servico                       Servico? @relation(fields: [servicoId], references: [id])
 }
 
 model AgendaFuncionario {

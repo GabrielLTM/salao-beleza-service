@@ -23,14 +23,23 @@ export class AnaliseService {
     const faturamentos = await this.vendaRepository.faturamentoPorFuncionario(inicio, fim);
     const mapFat = new Map(faturamentos.map((f) => [f.funcionarioId, f.total]));
 
+    const comissoes = await this.vendaRepository.comissaoPorFuncionario(inicio, fim);
+    const mapComissao = new Map(comissoes.map((c) => [c.funcionarioId, c]));
+
     const linhas = await Promise.all(
-      funcionarios.map(async (f) => ({
-        id: f.id,
-        nomeCompleto: f.nomeCompleto,
-        nivelPermissao: f.nivelPermissao,
-        agendamentosConcluidos: await this.agendamentoRepository.contarPorFuncionarioConcluidos(f.id, inicio, fim),
-        totalFaturado: mapFat.get(f.id) ?? 0,
-      })),
+      funcionarios.map(async (f) => {
+        const comissao = mapComissao.get(f.id);
+        return {
+          id: f.id,
+          nomeCompleto: f.nomeCompleto,
+          nivelPermissao: f.nivelPermissao,
+          agendamentosConcluidos: await this.agendamentoRepository.contarPorFuncionarioConcluidos(f.id, inicio, fim),
+          totalFaturado: mapFat.get(f.id) ?? 0,
+          totalComissao: comissao?.comissaoTotal ?? 0,
+          comissaoProduto: comissao?.comissaoProduto ?? 0,
+          comissaoServico: comissao?.comissaoServico ?? 0,
+        };
+      }),
     );
 
     return {

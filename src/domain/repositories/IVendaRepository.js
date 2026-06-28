@@ -6,6 +6,9 @@
  * @property {string|null} servicoId
  * @property {number} quantidade
  * @property {number} valorUnitario
+ * @property {number} [percentualComissaoBase]
+ * @property {number} [percentualComissaoFuncionario]
+ * @property {number} [valorComissao]
  *
  * @typedef {object} VendaRegistro
  * @property {string} id
@@ -23,5 +26,6 @@ export class IVendaRepository {
   async criar(_registro) { throw new Error('Nao implementado'); }
   async somarTotalNoPeriodo(_inicio, _fim) { throw new Error('Nao implementado'); }
   async faturamentoPorFuncionario(_inicio, _fim) { throw new Error('Nao implementado'); }
+  async comissaoPorFuncionario(_inicio, _fim) { throw new Error('Nao implementado'); }
   async rankingServicosVendidos(_inicio, _fim, _limite) { throw new Error('Nao implementado'); }
 }

@@ -45,6 +45,9 @@ export class PrismaVendaRepository extends IVendaRepository {
             servicoId: i.servicoId,
             quantidade: i.quantidade,
             valorUnitario: i.valorUnitario,
+            percentualComissaoBase: i.percentualComissaoBase ?? 0,
+            percentualComissaoFuncionario: i.percentualComissaoFuncionario ?? 0,
+            valorComissao: i.valorComissao ?? 0,
           })),
         });
       }
@@ -69,6 +72,35 @@ export class PrismaVendaRepository extends IVendaRepository {
     return r.map((linha) => ({
       funcionarioId: linha.funcionarioId,
       total: linha._sum.total ? Number(linha._sum.total.toString()) : 0,
+    }));
+  }
+
+  async comissaoPorFuncionario(inicio, fim) {
+    // groupBy do Prisma/MongoDB nao agrega por campo de relacao (venda.funcionarioId a partir
+    // do itemVenda), entao buscamos as vendas do periodo com os itens e somamos em memoria.
+    // Volume de um salao torna isso adequado.
+    const vendas = await this.prisma.venda.findMany({
+      where: { dataHora: { gte: inicio, lte: fim } },
+      select: { funcionarioId: true, itens: { select: { tipo: true, valorComissao: true } } },
+    });
+
+    const porFuncionario = new Map();
+    for (const venda of vendas) {
+      const acc = porFuncionario.get(venda.funcionarioId) ?? { total: 0, produto: 0, servico: 0 };
+      for (const item of venda.itens) {
+        const valor = item.valorComissao ? Number(item.valorComissao.toString()) : 0;
+        acc.total += valor;
+        if (item.tipo === 'PRODUTO') acc.produto += valor;
+        else if (item.tipo === 'SERVICO') acc.servico += valor;
+      }
+      porFuncionario.set(venda.funcionarioId, acc);
+    }
+
+    return [...porFuncionario.entries()].map(([funcionarioId, v]) => ({
+      funcionarioId,
+      comissaoTotal: Math.round(v.total * 100) / 100,
+      comissaoProduto: Math.round(v.produto * 100) / 100,
+      comissaoServico: Math.round(v.servico * 100) / 100,
     }));
   }
 

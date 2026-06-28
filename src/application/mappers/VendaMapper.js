@@ -20,6 +20,9 @@ export const VendaMapper = {
         servicoId: i.servicoId ?? null,
         quantidade: i.quantidade,
         valorUnitario: decimalParaNumero(i.valorUnitario),
+        percentualComissaoBase: decimalParaNumero(i.percentualComissaoBase),
+        percentualComissaoFuncionario: decimalParaNumero(i.percentualComissaoFuncionario),
+        valorComissao: decimalParaNumero(i.valorComissao),
       })),
     };
   },

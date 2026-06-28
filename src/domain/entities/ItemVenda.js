@@ -7,7 +7,16 @@ export const TipoItemVenda = Object.freeze({
 });
 
 export class ItemVenda {
-  constructor({ id = randomUUID(), tipo, produtoId = null, servicoId = null, quantidade, valorUnitario }) {
+  constructor({
+    id = randomUUID(),
+    tipo,
+    produtoId = null,
+    servicoId = null,
+    quantidade,
+    valorUnitario,
+    percentualComissaoBase = 0,
+    percentualComissaoFuncionario = 0,
+  }) {
     const erros = [];
     if (tipo !== TipoItemVenda.PRODUTO && tipo !== TipoItemVenda.SERVICO) {
       erros.push('tipo do item deve ser PRODUTO ou SERVICO.');
@@ -28,9 +37,21 @@ export class ItemVenda {
     this.servicoId = tipo === TipoItemVenda.SERVICO ? servicoId : null;
     this.quantidade = Number(quantidade);
     this.valorUnitario = Number(valorUnitario);
+    // Snapshot dos percentuais vigentes no momento da venda (% do item e % do funcionario).
+    this.percentualComissaoBase = Number(percentualComissaoBase) || 0;
+    this.percentualComissaoFuncionario = Number(percentualComissaoFuncionario) || 0;
   }
 
   subtotal() {
     return this.quantidade * this.valorUnitario;
+  }
+
+  /**
+   * Comissao do item: incide o percentual do funcionario sobre o percentual do item,
+   * nao sobre o valor de venda. Ex.: subtotal 100, item 80%, funcionario 5% => 4,00.
+   */
+  valorComissao() {
+    const bruto = this.subtotal() * (this.percentualComissaoBase / 100) * (this.percentualComissaoFuncionario / 100);
+    return Math.round(bruto * 100) / 100;
   }
 }
