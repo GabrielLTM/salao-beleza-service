@@ -32,6 +32,7 @@ export class ServicoService {
       precoMinimo: servico.precoMinimo,
       categoriaId: servico.categoriaId,
       status: servico.status,
+      percentualComissao: servico.percentualComissao,
     });
     return ServicoMapper.paraDto({ ...salvo, nomeCategoria: categoria.nome });
   }
@@ -51,6 +52,7 @@ export class ServicoService {
       precoMinimo: servico.precoMinimo,
       categoriaId: servico.categoriaId,
       status: servico.status,
+      percentualComissao: servico.percentualComissao,
     });
     return ServicoMapper.paraDto({ ...salvo, nomeCategoria: categoria.nome });
   }

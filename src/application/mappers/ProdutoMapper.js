@@ -13,6 +13,7 @@ export const ProdutoMapper = {
       valor: decimalParaNumero(p.valor),
       caminhoImagem: p.caminhoImagem ?? null,
       status: p.status,
+      percentualComissao: decimalParaNumero(p.percentualComissao),
     };
   },
 };

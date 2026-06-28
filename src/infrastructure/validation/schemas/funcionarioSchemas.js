@@ -4,7 +4,7 @@ import { dataNascimentoSchema, dataOpcionalSchema, dataPassadaSchema } from './c
 // Regex genérico para validar apenas letras e espaços (permite acentos)
 const apenasLetrasRegex = /^[A-Za-zÀ-ÿ\s]+$/;
 
-// Schema customizado para telefone/celular
+// Schema customizado para telefone
 const telefoneSchema = z
   .string()
   .trim()
@@ -37,8 +37,7 @@ const camposComuns = {
   endereco: z.string().trim().nullable().optional(),
   
   telefone: telefoneSchema,
-  celular: telefoneSchema,
-  
+
   profissoes: z
     .array(
       z
@@ -57,6 +56,19 @@ const camposComuns = {
   
   nivelPermissao: z.number().int().min(1).max(4),
   status: z.number().int().min(0).max(1),
+
+  percentualComissaoProduto: z
+    .number()
+    .min(0, 'percentualComissaoProduto deve ser >= 0.')
+    .max(100, 'percentualComissaoProduto deve ser <= 100.')
+    .optional()
+    .default(0),
+  percentualComissaoServico: z
+    .number()
+    .min(0, 'percentualComissaoServico deve ser >= 0.')
+    .max(100, 'percentualComissaoServico deve ser <= 100.')
+    .optional()
+    .default(0),
 };
 
 export const cadastrarFuncionarioSchema = z.object({

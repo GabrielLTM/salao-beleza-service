@@ -11,13 +11,14 @@ export const FuncionarioMapper = {
       cpf: f.cpf ?? null,
       endereco: f.endereco ?? null,
       telefone: f.telefone ?? null,
-      celular: f.celular ?? null,
       profissoes: f.profissoes ?? [],
       email: f.email,
       dataNascimento: f.dataNascimento ? new Date(f.dataNascimento).toISOString() : null,
       dataAdmissao: f.dataAdmissao ? new Date(f.dataAdmissao).toISOString() : null,
       nivelPermissao: f.nivelPermissao,
       status: f.status,
+      percentualComissaoProduto: f.percentualComissaoProduto ?? 0,
+      percentualComissaoServico: f.percentualComissaoServico ?? 0,
     };
   },
 };

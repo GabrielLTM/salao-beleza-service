@@ -22,6 +22,7 @@ export class ProdutoService {
     const p = new Produto(entrada);
     const salvo = await this.produtoRepository.criar({
       id: p.id, nome: p.nome, valor: p.valor, caminhoImagem: p.caminhoImagem, status: p.status,
+      percentualComissao: p.percentualComissao,
     });
     return ProdutoMapper.paraDto(salvo);
   }
@@ -32,6 +33,7 @@ export class ProdutoService {
     const p = new Produto({ ...entrada, id });
     const salvo = await this.produtoRepository.atualizar({
       id: p.id, nome: p.nome, valor: p.valor, caminhoImagem: p.caminhoImagem, status: p.status,
+      percentualComissao: p.percentualComissao,
     });
     return ProdutoMapper.paraDto(salvo);
   }

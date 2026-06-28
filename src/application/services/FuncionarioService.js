@@ -53,7 +53,6 @@ export class FuncionarioService {
       cpf: funcionario.cpf,
       endereco: funcionario.endereco,
       telefone: funcionario.telefone,
-      celular: funcionario.celular,
       profissoes: funcionario.profissoes,
       email: funcionario.email, // Será salvo em minúsculo
       senhaHash: funcionario.senhaHash,
@@ -61,6 +60,8 @@ export class FuncionarioService {
       dataAdmissao: funcionario.dataAdmissao,
       nivelPermissao: funcionario.nivelPermissao,
       status: funcionario.status,
+      percentualComissaoProduto: funcionario.percentualComissaoProduto,
+      percentualComissaoServico: funcionario.percentualComissaoServico,
     });
     return FuncionarioMapper.paraDto(salvo);
   }
@@ -94,7 +95,6 @@ export class FuncionarioService {
       cpf: funcionario.cpf,
       endereco: funcionario.endereco,
       telefone: funcionario.telefone,
-      celular: funcionario.celular,
       profissoes: funcionario.profissoes,
       email: funcionario.email,
       senhaHash: funcionario.senhaHash,
@@ -102,6 +102,8 @@ export class FuncionarioService {
       dataAdmissao: funcionario.dataAdmissao,
       nivelPermissao: funcionario.nivelPermissao,
       status: funcionario.status,
+      percentualComissaoProduto: funcionario.percentualComissaoProduto,
+      percentualComissaoServico: funcionario.percentualComissaoServico,
     });
     return FuncionarioMapper.paraDto(salvo);
   }
